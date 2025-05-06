@@ -10,30 +10,49 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EventGridService eventGridService;
+
     @GetMapping("/usuarios")
     public ResponseEntity<?> getAllUsers() {
-        System.out.println("hola");
-        return userService.forwardRequest("https://usercreate-bjh2gkamerf3bua6.eastus2-01.azurewebsites.net/api/usuarios", "GET", null);
+        String query = "query { getAllUsers { id name } }";
+        return userService.forwardGraphQLRequest(query);
     }
 
     @GetMapping("/usuarios/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
-        return userService.forwardRequest("https://usercreate-bjh2gkamerf3bua6.eastus2-01.azurewebsites.net/api/usuarios/" + id, "GET", null);
+        String query = String.format("{ getUserById(id: %s) { id name } }", id);
+        return userService.forwardGraphQLRequest(query);
     }
 
     @PostMapping("/usuarios")
     public ResponseEntity<?> createUser(@RequestBody String body) {
-        return userService.forwardRequest("https://userupdate-cvhpgfgjdmatfagq.eastus2-01.azurewebsites.net/api/usuarios", "POST", body);
+        try {
+            eventGridService.sendUserEvent(body, "users", "create");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 
     @PutMapping("/usuarios")
     public ResponseEntity<?> updateUser(@RequestBody String body) {
-        return userService.forwardRequest("https://userupdate-cvhpgfgjdmatfagq.eastus2-01.azurewebsites.net/api/usuarios", "PUT", body);
+        try {
+            eventGridService.sendUserEvent(body, "users", "update");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/usuarios")
     public ResponseEntity<?> deleteUser(@RequestBody String body) {
-        return userService.forwardRequest("https://userupdate-cvhpgfgjdmatfagq.eastus2-01.azurewebsites.net/api/usuarios", "DELETE", body);
+        try {
+            eventGridService.sendUserEvent(body, "users", "delete");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 }
 

@@ -45,7 +45,7 @@ public class UserService {
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
-        ResponseEntity<String> response = restTemplate.postForEntity("https://graphqueries.azurewebsites.net/api/roles", entity, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity("https://user-graph.azurewebsites.net/api/users?", entity, String.class);
 
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }

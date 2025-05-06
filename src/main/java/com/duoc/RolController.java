@@ -8,36 +8,51 @@ import org.springframework.web.bind.annotation.*;
 public class RolController {
 
     @Autowired
-    private UserService userService;
+    private RolService RolService;
+
+    @Autowired
+    private EventGridService eventGridService;
 
     @GetMapping("/roles")
     public ResponseEntity<?> getAllRoles() {
         String query = "query { getAllRoles { id name } }";
-        return userService.forwardGraphQLRequest(query);
+        return RolService.forwardGraphQLRequest(query);
     }
 
     @GetMapping("/roles/{id}")
     public ResponseEntity<?> getRoleById(@PathVariable String id) {
         String query = String.format("{ getRolById(id: %s) { id name } }", id);
-        return userService.forwardGraphQLRequest(query);
+        return RolService.forwardGraphQLRequest(query);
     }
 
     @PostMapping("/roles")
     public ResponseEntity<?> createRole(@RequestBody String body) {
-        String mutation = String.format("mutation { createRole(input: %s) { id name } }", body);
-        return userService.forwardGraphQLRequest(mutation);
+        try {
+            eventGridService.sendRolEvent(body, "rol", "create");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 
     @PutMapping("/roles")
     public ResponseEntity<?> updateRole(@RequestBody String body) {
-        String mutation = String.format("mutation { updateRole(input: %s) { id name } }", body);
-        return userService.forwardGraphQLRequest(mutation);
+        try {
+            eventGridService.sendRolEvent(body, "rol", "update");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/roles")
     public ResponseEntity<?> deleteRole(@RequestBody String body) {
-        String mutation = String.format("mutation { deleteRole(input: %s) { id } }", body);
-        return userService.forwardGraphQLRequest(mutation);
+        try {
+            eventGridService.sendRolEvent(body, "rol", "delete");
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
     }
 }
 

@@ -1,3 +1,6 @@
 com\duoc\UserService.class
+com\duoc\RolService.class
 com\duoc\ProxyApiApplication.class
+com\duoc\EventGridService.class
 com\duoc\UserController.class
+com\duoc\RolController.class
