@@ -15,13 +15,13 @@ public class UserController {
 
     @GetMapping("/usuarios")
     public ResponseEntity<?> getAllUsers() {
-        String query = "query { getAllUsers { id name } }";
+        String query = "query { getAllUsers { id name username password rol } }";
         return userService.forwardGraphQLRequest(query);
     }
 
     @GetMapping("/usuarios/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
-        String query = String.format("{ getUserById(id: %s) { id name } }", id);
+        String query = String.format("{ getUserById(id: %s) { id name username password rol } }", id);
         return userService.forwardGraphQLRequest(query);
     }
 
